@@ -1,0 +1,23 @@
+# MEMORY — {{ project.name }}
+
+Accumulated project knowledge across sessions. Maintained by the `documentator`
+(and the `handoff` skill). The factory reads this to stay consistent over time;
+keep it terse and factual.
+
+> Domain language lives in `CONTEXT.md`; decisions in `docs/adr/`; recurring
+> frictions in `docs/learnings/patterns.md`. This file is the cross-session
+> business + state memory + the session index.
+
+## Project facts
+
+- One-liner: {{ project.one_liner }}
+- Users: {{ project.users }}
+- Specialization: {{ domain.specialization.kind }} — {{ domain.specialization.label }}
+
+## Business knowledge
+
+<!-- documentator appends durable business facts learned while building -->
+
+## Session index
+
+<!-- handoff appends one line per session: date — topic — docs/sessions/<file> -->

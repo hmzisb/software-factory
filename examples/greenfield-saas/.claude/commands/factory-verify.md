@@ -1,0 +1,19 @@
+---
+description: Run the verification gate — tests, typecheck, lint, build. Show the output. Evidence before done.
+---
+
+Run the verification gate. Execute the commands from
+`.claude/rules/validation-commands.md` and **show the real output** — never claim
+pass without proof (`.claude/skills/verification`).
+
+```
+pnpm test
+pnpm run typecheck
+pnpm run lint
+pnpm run build
+```
+
+(Skip any command that is empty/not configured.)
+
+Report: for each, PASS/FAIL with the relevant output. If anything fails, stop and
+surface the failure first — do not proceed to ship.

@@ -1,0 +1,16 @@
+---
+description: Resume work on the project from the last session's handoff and memory.
+---
+
+Resume work on Tasker.
+
+1. Read, in order: the latest `docs/sessions/*.md` (most recent handoff),
+   `MEMORY.md`, and `CONTEXT.md`.
+2. **Trust disk state, not assumptions.** Re-check what actually merged and what
+   is running (git log, the test command) before continuing — never claim work is
+   "already in progress".
+3. Do the handoff's "Next action". If it's unclear or stale, summarize the state
+   and ask the user one question.
+
+If there is no handoff yet, summarize the repo state from `CLAUDE.md` +
+`CONTEXT.md` and ask what to work on.

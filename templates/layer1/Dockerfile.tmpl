@@ -1,0 +1,31 @@
+# Layer 1 builder container for {{ project.name }}.
+# Runs the app + the builder chat, so the factory can run with
+# --dangerously-skip-permissions safely inside isolation.
+#
+# This is a starting point — adjust the app runtime for {{ stack.language }}
+# ({{ stack.framework }}) as needed.
+
+FROM debian:stable-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      python3 curl ca-certificates git nodejs npm \
+    && rm -rf /var/lib/apt/lists/*
+
+# Claude Code CLI (the factory engine)
+RUN npm install -g @anthropic-ai/claude-code || true
+
+# TODO: install your app's runtime + dependencies here.
+#   - node:  COPY package*.json ./ && npm ci
+#   - python: COPY pyproject.toml ./ && pip install -e .
+#   - go/rust: copy + build
+
+WORKDIR /app
+COPY . /app
+
+ENV PROJECT_DIR=/app
+ENV BUILDER_PORT=8080
+EXPOSE 8080
+
+# Start the builder chat. (Run your app process alongside it in compose, or add a
+# supervisor here.)
+CMD ["python3", "/app/builder/server.py"]

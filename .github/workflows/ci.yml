@@ -1,0 +1,16 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit + end-to-end suite (stdlib only, no third-party deps)
+        run: python3 -m unittest discover -s tests -v
+      - name: Pipeline demo (no API key)
+        run: bash examples/demo/run_demo.sh

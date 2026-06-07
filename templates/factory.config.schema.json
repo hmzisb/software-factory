@@ -1,0 +1,203 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/hamzaahmed/software-factory/factory.config.schema.json",
+  "title": "factory.config.json",
+  "description": "Validated answers from the software-factory interview. Drives deterministic scaffolding. Same config -> same tree.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "validated", "mode", "project", "stack", "quality", "factory", "interview_progress"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "validated": {
+      "type": "boolean",
+      "description": "Set true only after all applicable domains are done and consistency checks pass. Scaffolding refuses to run when false."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["greenfield", "retrofit"],
+      "description": "greenfield = empty dir, write the full tree. retrofit = existing repo, merge without clobbering."
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "one_liner"],
+      "properties": {
+        "name": { "type": "string" },
+        "one_liner": { "type": "string", "description": "What it is, in one sentence." },
+        "problem": { "type": "string", "description": "The problem it solves." },
+        "users": { "type": "string", "description": "Who uses it." },
+        "success_metric": { "type": "string", "description": "How success is measured." }
+      }
+    },
+    "starter": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The base template the factory specialized (from scripts/starters.json). null repo = built from scratch.",
+      "properties": {
+        "id": { "type": "string" },
+        "repo": { "type": ["string", "null"] },
+        "ref": { "type": ["string", "null"] },
+        "dev_cmd": { "type": "string" }
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Domain shared language -> CONTEXT.md. Drives specialization (the article's failure-rate principle).",
+      "properties": {
+        "specialization": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "type": "string", "enum": ["job", "domain", "general"] },
+            "label": { "type": "string", "description": "e.g. 'recruitment' (job) or 'bike rental' (domain)." }
+          }
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "relationships": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "glossary": {
+          "type": "object",
+          "description": "term -> definition",
+          "additionalProperties": { "type": "string" }
+        },
+        "workflows": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "stack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language"],
+      "properties": {
+        "language": { "type": "string", "description": "Primary language, e.g. typescript, python, go, rust." },
+        "framework": { "type": "string" },
+        "database": { "type": "string" },
+        "package_manager": { "type": "string" },
+        "runtime": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["test_cmd"],
+      "description": "The project's own commands. The eval runner and the validate-before-review hook shell out to these.",
+      "properties": {
+        "test_cmd": { "type": "string", "description": "e.g. 'npm test' / 'pytest' / 'go test ./...'" },
+        "dev_cmd": { "type": "string", "description": "Run the app for a live preview, e.g. 'npm run dev' / 'docker compose up'." },
+        "build_cmd": { "type": "string" },
+        "lint_cmd": { "type": "string" },
+        "typecheck_cmd": { "type": "string" },
+        "test_framework": { "type": "string" },
+        "coverage_target": { "type": ["number", "null"], "description": "0-100 or null." }
+      }
+    },
+    "nfrs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Non-functional requirements.",
+      "properties": {
+        "security": { "type": "array", "items": { "type": "string" }, "description": "Boundaries: auth, scopes, secrets, RLS, input validation." },
+        "performance": { "type": "string" },
+        "accessibility": { "type": "string" },
+        "i18n": { "type": "boolean" }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "git_host": { "type": "string", "enum": ["github", "gitlab", "local", "none"] },
+        "ci": { "type": "boolean" },
+        "deploy_target": { "type": "string", "description": "e.g. vercel, netlify, fly.io, cloudflare, render. Drives deploy/deploy.sh." },
+        "backend": { "type": "string", "description": "Managed backend for full mode, e.g. supabase, neon, planetscale. Drives db/provision.sh." },
+        "migration_tool": { "type": "string", "description": "ORM/migration tool: prisma, drizzle, alembic, supabase, django, typeorm. Drives db/migrate.sh." },
+        "data_mode": { "type": "string", "enum": ["demo", "full"], "default": "demo", "description": "demo = mocked/in-memory; full = real backend + migrations." },
+        "environments": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "factory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layers"],
+      "properties": {
+        "layers": {
+          "type": "array",
+          "items": { "type": "integer", "enum": [0, 1] },
+          "minItems": 1,
+          "description": "[0] = dev harness only. [0,1] = also generate the product-factory layer."
+        },
+        "agent_team_size": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 3,
+          "description": "Max tickets per wave (N). Wave dispatches 3N+1 agents."
+        },
+        "autonomy": {
+          "type": "string",
+          "enum": ["supervised", "semi-autonomous", "autonomous"],
+          "default": "semi-autonomous",
+          "description": "How much the factory does before pausing for human review."
+        },
+        "budget_usd": {
+          "type": ["number", "null"],
+          "default": null,
+          "description": "Soft per-request cost cap in USD. The factory pauses and asks before exceeding it. null/0 = no cap."
+        }
+      }
+    },
+    "seed": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generate_prd": { "type": "boolean", "default": false, "description": "Generate the first PRD + vertical-slice tickets after scaffolding." },
+        "first_feature": { "type": "string", "description": "One-line description of the first thing to build." }
+      }
+    },
+    "eval": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Probabilistic eval harness config. Read by eval/run.py.",
+      "properties": {
+        "runner": { "type": "string", "description": "Command templated with {prompt},{id},{sandbox} that drives the factory for a prompt." },
+        "default_runs": { "type": "integer", "minimum": 1, "default": 5, "description": "Times each case runs." },
+        "success_threshold": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.8 }
+      }
+    },
+    "uses_external_skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Detected at scaffold time. When true, CLAUDE.md links to the plugin instead of relying solely on the vendored skill.",
+      "properties": {
+        "superpowers": { "type": "boolean" },
+        "mattpocock": { "type": "boolean" }
+      }
+    },
+    "interview_progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "done | pending | skipped per domain.",
+      "properties": {
+        "d1_product": { "type": "string", "enum": ["done", "pending", "skipped"] },
+        "d2_domain": { "type": "string", "enum": ["done", "pending", "skipped"] },
+        "d3_stack": { "type": "string", "enum": ["done", "pending", "skipped"] },
+        "d4_quality": { "type": "string", "enum": ["done", "pending", "skipped"] },
+        "d5_nfrs": { "type": "string", "enum": ["done", "pending", "skipped"] },
+        "d6_delivery": { "type": "string", "enum": ["done", "pending", "skipped"] },
+        "d7_factory": { "type": "string", "enum": ["done", "pending", "skipped"] },
+        "d8_seed": { "type": "string", "enum": ["done", "pending", "skipped"] }
+      }
+    }
+  }
+}

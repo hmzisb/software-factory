@@ -1,0 +1,19 @@
+---
+description: Build a feature through the factory — classify, plan, implement in waves, verify, document.
+argument-hint: "<feature request>"
+---
+
+Drive the software factory to build: **$ARGUMENTS**
+
+Act as the `orchestrator` (see `.claude/agents/orchestrator.md`):
+
+1. Read `CLAUDE.md` and `CONTEXT.md`.
+2. Classify the request (SIMPLE vs COMPLEX).
+3. COMPLEX → dispatch `planner`, then run waves of `developer` + `reviewer` +
+   `test-validator` (trio per ticket) + a shared `merger`. SIMPLE → one
+   `developer` → verify → `merger`.
+4. After each wave merges, run the verify gate and dispatch `documentator`.
+5. Gate the result against `definition-of-done.md` and report what changed for
+   the user.
+
+Respect the autonomy level set in `CLAUDE.md` ({{ factory.autonomy }}).

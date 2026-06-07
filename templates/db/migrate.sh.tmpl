@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Generate / apply DB migrations for {{ project.name }} ({{ stack.database }}).
+# Demo mode: not needed (data is in-memory). Full mode: gated.
+#
+# Usage:
+#   bash db/migrate.sh generate "<name>"   # create a migration from the schema diff
+#   bash db/migrate.sh apply [--yes]        # apply pending migrations (dry until --yes)
+set -euo pipefail
+
+TOOL="{{ delivery.migration_tool }}"
+ACTION="${1:-}"
+NAME="${2:-change}"
+
+if [ -z "$TOOL" ]; then
+  echo "No migration tool set (delivery.migration_tool). See references/backend-provisioning.md."
+  exit 1
+fi
+
+generate() {
+  case "$TOOL" in
+    prisma)   npx prisma migrate dev --name "$NAME" ;;
+    drizzle)  npx drizzle-kit generate ;;
+    alembic)  alembic revision --autogenerate -m "$NAME" ;;
+    supabase) supabase db diff -f "$NAME" ;;
+    django)   python manage.py makemigrations ;;
+    typeorm)  npx typeorm migration:generate -n "$NAME" ;;
+    *)        echo "No generate recipe for '$TOOL' — add one in db/migrate.sh."; exit 1 ;;
+  esac
+}
+
+apply() {
+  case "$TOOL" in
+    prisma)   npx prisma migrate deploy ;;
+    drizzle)  npx drizzle-kit migrate ;;
+    alembic)  alembic upgrade head ;;
+    supabase) supabase db push ;;
+    django)   python manage.py migrate ;;
+    typeorm)  npx typeorm migration:run ;;
+    *)        echo "No apply recipe for '$TOOL'."; exit 1 ;;
+  esac
+}
+
+case "$ACTION" in
+  generate)
+    generate
+    echo "Migration generated. Review the SQL, then: bash db/migrate.sh apply --yes" ;;
+  apply)
+    if [ "${2:-}" != "--yes" ] && [ "${CONFIRM:-}" != "1" ]; then
+      echo "Dry run — would apply pending migrations with '$TOOL'. Re-run with --yes (or CONFIRM=1)."
+      exit 0
+    fi
+    apply
+    echo "Migrations applied." ;;
+  *)
+    echo "Usage: db/migrate.sh generate <name> | apply [--yes]"
+    exit 1 ;;
+esac

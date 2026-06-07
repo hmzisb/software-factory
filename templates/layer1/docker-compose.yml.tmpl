@@ -1,0 +1,16 @@
+# Layer 1 — run the builder for {{ project.name }} in isolation.
+#   docker compose up --build   then open http://localhost:8080
+services:
+  builder:
+    build: .
+    ports:
+      - "127.0.0.1:8080:8080"   # builder chat — loopback only, never the LAN
+      # - "127.0.0.1:3000:3000" # TODO: expose your app's port too (loopback)
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PROJECT_DIR: /app
+      BUILDER_PORT: "8080"
+      # Optional fixed token; if unset the server prints a random one at startup.
+      BUILDER_TOKEN: ${BUILDER_TOKEN:-}
+    volumes:
+      - ./:/app        # dev: live project. Remove for a sealed build.

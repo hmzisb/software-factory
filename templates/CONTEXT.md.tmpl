@@ -1,0 +1,25 @@
+# Domain context — {{ project.name }}
+
+The shared, ubiquitous language of this domain. Use these terms **exactly** in
+code, comments, commits, specs, and conversation. The documentator keeps this
+file current; do not let terminology drift.
+
+Specialization: **{{ domain.specialization.kind }}** — {{ domain.specialization.label }}.
+
+## Entities
+
+{{ computed.entities_md }}
+
+## Glossary
+
+{{ computed.glossary_md }}
+
+## Key workflows
+
+{{ computed.workflows_md }}
+
+---
+
+> When a change introduces a new term, relationship, or workflow, update this
+> file in the same change (it's part of the definition of done). When a term here
+> stops matching the code, that's a bug — fix one or the other.

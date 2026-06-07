@@ -1,0 +1,36 @@
+# Data modes — demo vs full
+
+A non-coder needs the app to work *now* and to persist *later*, without ever
+configuring a database. Two modes solve that (the crm-builder pattern).
+
+## Demo mode (default for building)
+
+- Data is mocked / in-memory (e.g. a fake data provider, SQLite file, or seed
+  fixtures). Reloading resets it.
+- **Instant** — no network, no migrations, no provisioning. Iterate fast, preview
+  immediately.
+- Schema changes touch only the app's models/types. No SQL runs.
+
+## Full mode (for real use)
+
+- A real backend (managed Postgres / Supabase / your DB of choice):
+  **{{ stack.database }}**.
+- Schema changes require a migration (`.claude/skills/writing-migrations`),
+  generated from the diff and applied deliberately.
+- Real auth, persistence, file storage, and access rules apply.
+
+## Flow
+
+```
+build + preview in DEMO  ->  user happy  ->  promote to FULL:
+   generate migration from the schema diff  ->  review SQL  ->  apply  ->  deploy
+```
+
+## Rules
+
+- Build features so they work in **demo first** — don't block iteration on a DB.
+- Promote to full only when the user is satisfied (after the satisfaction loop).
+- Switching a non-coder's app to full / real data is a confirmed step — say so in
+  plain language ("Want me to switch your app to your real data now?").
+- Never point demo at real data; never run a destructive migration without a
+  human OK.

@@ -1,0 +1,39 @@
+# Security
+
+Project-specific boundaries: session auth on all mutations; validate task input server-side
+
+## Always
+
+- **Validate at boundaries.** Every external input (user, API, file, env) is
+  untrusted until validated. Reject, don't coerce silently.
+- **No secrets in the repo.** Keys/tokens/passwords live in env/secret stores,
+  never in code, fixtures, logs, or commits. Scan the diff before committing.
+- **Injection.** Parameterize SQL; never build shell/SQL/HTML by string
+  concatenation of untrusted input. Escape on output.
+- **AuthZ.** Enforce auth and scope on every protected path. Default-closed —
+  deny unless explicitly allowed. Watch for default-open flags.
+- **Data integrity.** On deletes/relations, avoid orphan rows; use FKs/cascade
+  intentionally.
+- **Least privilege.** Tokens/roles get the narrowest scope that works.
+
+## Review triggers (block until addressed)
+
+- New external input without validation.
+- Raw query/command built from a variable.
+- A permission/visibility flag that defaults to open.
+- A secret-shaped string added to a tracked file.
+- A webhook/signature check that's missing or prefix-mismatched.
+
+## Guardrail hooks are a seatbelt, not a sandbox
+
+`.claude/hooks/protect-secrets.py` and `block-dangerous-git.py` catch the common
+mistakes (secret-shaped values, force-push, `rm -rf .`, history destruction).
+They are **best-effort heuristics** — a novel secret format or an obfuscated
+command can slip past, and they are not a substitute for real controls:
+
+- Run a dedicated secret scanner in CI (`gitleaks` or `trufflehog`) — it has far
+  broader coverage than the hook's handful of patterns.
+- Keep branch protection + required review on the remote; the hook can't enforce
+  what happens server-side.
+- The real isolation for autonomous work is the worktree + human review (and, for
+  Layer 1, the container) — not the hook.

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "example-add-field",
+    "prompt": "Add a 'priority' field (low/medium/high) to the primary entity, with a test.",
+    "timeout": 1800,
+    "expect": {
+      "mustInvoke": ["developer", "reviewer"],
+      "mustNotInvoke": [],
+      "files": [],
+      "checks": [],
+      "mustModify": [],
+      "mustNotModify": ["**/auth/**", "**/billing/**"],
+      "maxDurationMs": 1800000,
+      "maxCostUsd": 6.0
+    }
+  }
+]

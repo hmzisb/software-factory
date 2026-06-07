@@ -1,0 +1,43 @@
+# Cost controls
+
+Agent teams cost money (a from-scratch build can run tens of dollars). Keep it
+predictable — especially when a non-coder is driving.
+
+## Model tiering (enforced via agent frontmatter)
+
+| Tier | Agents | Why |
+|---|---|---|
+| opus | developer | Hard reasoning — implementation. The expensive one; use sparingly. |
+| sonnet | orchestrator, planner, reviewer, test-validator, documentator | Coordination + review. |
+| haiku | merger | Mechanical (git merge only). |
+
+Never promote an agent to a bigger model than its role needs.
+
+## Budget cap
+
+Per-request budget: **${{ factory.budget_usd }}** (0 / blank = no hard cap).
+When a request is trending past the cap, **pause and ask** before continuing —
+in plain language ("This is turning into a bigger job than expected — keep
+going?"). Don't silently burn through.
+
+## Keep cold cost down
+
+- Lean `CLAUDE.md` (it's in context every turn); details live in `rules/` loaded
+  on demand.
+- Keep `settings.json` `enabledPlugins` minimal — a cold cache is expensive even
+  for a trivial turn.
+- Keep primary context < ~100k tokens; push heavy reads (large files, broad
+  greps) into subagents that return only the relevant slice.
+
+## Cheap-first routing
+
+- Try the SIMPLE path before COMPLEX (one developer, no planner/team) when the
+  change is small. False-positives toward COMPLEX cost real money.
+- Reuse a starter instead of building from scratch (far fewer tokens).
+
+## Surface cost (Layer 1)
+
+When a builder UI is present, show a rough cost after each request so the user
+sees what they're spending. Parse it from the runner's result output
+(`--output-format stream-json` exposes `total_cost_usd`; note it is cumulative
+within a spawn — don't sum per-event).

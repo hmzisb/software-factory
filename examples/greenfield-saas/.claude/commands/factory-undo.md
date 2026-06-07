@@ -1,0 +1,21 @@
+---
+description: Safely undo the last change the factory made, without losing other work.
+---
+
+Undo the most recent factory change to Tasker.
+
+1. Find the last change the factory landed on the default branch (the most recent
+   merge/commit it created). Summarize it for the user in **plain language** and
+   confirm: *"This will undo: <what changed>. Go ahead?"*
+2. On confirmation, revert it **safely** in a worktree:
+   - for a merge commit: `git revert -m 1 <sha>`; for a plain commit: `git revert <sha>`.
+   - Never `git reset --hard`, never force-push, never rewrite history (those are
+     blocked by the guardrail hook anyway).
+3. Run the verify gate (`/factory-verify`). If the revert breaks something,
+   resolve it or report plainly and stop — don't leave the app broken.
+4. Merge the revert via the normal flow (the `merger`).
+5. Tell the user, plainly: *"Done — I undid that change. Everything else is
+   still in place."*
+
+Only the last change. To undo more, run this again. Never touch unrelated
+history or other in-flight work.

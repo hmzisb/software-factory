@@ -1,0 +1,11 @@
+# Database — {{ stack.database }}
+
+Migrations live in `db/migrations/` (or your ORM's own dir — keep one source of
+truth). See `.claude/rules/data-modes.md` and
+`.claude/skills/writing-migrations/`.
+
+- **Demo mode:** no migrations run (data is mocked/in-memory).
+- **Full mode:** each schema change ships an ordered, reversible migration here,
+  generated from the diff and reviewed before apply.
+
+Never commit secrets or connection strings here — those live in env/secret store.

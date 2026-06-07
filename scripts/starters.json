@@ -1,0 +1,41 @@
+{
+  "_note": "Curated starter templates. The factory clones one as the base (marmelab's 'don't reinvent the wheel'), then stamps the harness on top. SUPPLY CHAIN: refs below point at moving branches for convenience — pin 'ref' to a tag or commit SHA before relying on a starter in production (fetch_starter.py --ref accepts any ref). Cloning is safe, but the FIRST `npm install`/`pip install` you run on a starter executes upstream postinstall code on your machine — review it. Add your own entries freely.",
+  "starters": [
+    {
+      "id": "crm",
+      "title": "CRM (React + shadcn + Supabase)",
+      "repo": "https://github.com/marmelab/atomic-crm",
+      "ref": "main",
+      "dev_cmd": "npm run dev",
+      "stack": {"language": "typescript", "framework": "react", "database": "supabase", "package_manager": "npm"},
+      "description": "Contacts / companies / deals CRM. The marmelab base used by crm-builder."
+    },
+    {
+      "id": "fullstack-fastapi",
+      "title": "Full-stack app (FastAPI + React + Postgres)",
+      "repo": "https://github.com/fastapi/full-stack-fastapi-template",
+      "ref": "master",
+      "dev_cmd": "docker compose up",
+      "stack": {"language": "python", "framework": "fastapi", "database": "postgres", "package_manager": "uv"},
+      "description": "Auth, CRUD, Docker, CI included. Good general business-app base."
+    },
+    {
+      "id": "next-saas",
+      "title": "SaaS (Next.js + Postgres + Stripe)",
+      "repo": "https://github.com/nextjs/saas-starter",
+      "ref": "main",
+      "dev_cmd": "pnpm dev",
+      "stack": {"language": "typescript", "framework": "next", "database": "postgres", "package_manager": "pnpm"},
+      "description": "Auth + subscriptions + dashboard. Good for paid web apps."
+    },
+    {
+      "id": "blank",
+      "title": "Blank — no starter, build from scratch",
+      "repo": null,
+      "ref": null,
+      "dev_cmd": "",
+      "stack": {},
+      "description": "Greenfield with no base app; the factory builds everything. Slower, fully custom."
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "validated": true,
+  "mode": "greenfield",
+  "project": {
+    "name": "Tasker",
+    "one_liner": "A minimal team task tracker.",
+    "problem": "Small teams lose tasks in chat.",
+    "users": "5-person product teams.",
+    "success_metric": "Every task has an owner and a state."
+  },
+  "domain": {
+    "specialization": {
+      "kind": "domain",
+      "label": "team productivity"
+    },
+    "entities": [
+      {
+        "name": "task",
+        "description": "A unit of work",
+        "relationships": [
+          "user",
+          "project"
+        ]
+      },
+      {
+        "name": "project",
+        "description": "A grouping of tasks",
+        "relationships": [
+          "task"
+        ]
+      },
+      {
+        "name": "user",
+        "description": "A team member",
+        "relationships": [
+          "task"
+        ]
+      }
+    ],
+    "glossary": {
+      "backlog": "tasks not yet started",
+      "wip": "work in progress"
+    },
+    "workflows": [
+      "Create a task",
+      "Assign a task",
+      "Move a task across states"
+    ]
+  },
+  "stack": {
+    "language": "typescript",
+    "framework": "next",
+    "database": "postgres",
+    "package_manager": "pnpm",
+    "runtime": "node"
+  },
+  "quality": {
+    "test_cmd": "pnpm test",
+    "build_cmd": "pnpm run build",
+    "lint_cmd": "pnpm run lint",
+    "typecheck_cmd": "pnpm run typecheck",
+    "test_framework": "vitest",
+    "coverage_target": 80
+  },
+  "nfrs": {
+    "security": [
+      "session auth on all mutations",
+      "validate task input server-side"
+    ],
+    "performance": "p95 < 200ms",
+    "accessibility": "WCAG AA",
+    "i18n": false
+  },
+  "delivery": {
+    "git_host": "github",
+    "ci": true,
+    "deploy_target": "vercel",
+    "environments": [
+      "preview",
+      "prod"
+    ],
+    "backend": "supabase",
+    "migration_tool": "prisma",
+    "data_mode": "demo"
+  },
+  "factory": {
+    "layers": [
+      0
+    ],
+    "agent_team_size": 3,
+    "autonomy": "semi-autonomous",
+    "budget_usd": 10
+  },
+  "seed": {
+    "generate_prd": false,
+    "first_feature": ""
+  },
+  "uses_external_skills": {
+    "superpowers": false,
+    "mattpocock": false
+  },
+  "interview_progress": {
+    "d1_product": "done",
+    "d2_domain": "done",
+    "d3_stack": "done",
+    "d4_quality": "done",
+    "d5_nfrs": "done",
+    "d6_delivery": "done",
+    "d7_factory": "done",
+    "d8_seed": "skipped"
+  }
+}

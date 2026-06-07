@@ -1,0 +1,36 @@
+# --- software-factory ---
+worktrees/            # per-ticket git worktrees (nested checkouts)
+*.bak                 # retrofit backups
+.promote.lock         # session promotion lock
+.claude/settings.local.json
+
+# --- secrets / env (never commit) ---
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- node ---
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# --- os / editor ---
+.DS_Store
+Thumbs.db
+*.swp

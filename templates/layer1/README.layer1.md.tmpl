@@ -1,0 +1,61 @@
+# Layer 1 — product factory for {{ project.name }}
+
+This turns the project into a **self-modifying product**: a non-technical user
+("builder") describes changes in plain language and the factory ships them.
+
+```
+builder (browser chat :8080)
+  -> builder/server.py  (spawns `claude -p`)
+     -> builder-orchestrator agent  (plain language)
+        -> Layer 0 factory (planner/developer/reviewer/test-validator/merger)
+           -> verify gate -> definition-of-done
+  -> plain-language reply: "I added ... to your app"
+```
+
+## Run
+
+```bash
+export ANTHROPIC_API_KEY=...      # or a Claude Code subscription login
+docker compose up --build
+# open http://localhost:8080
+```
+
+Everything runs **inside the container**, which is why the factory can use
+`--dangerously-skip-permissions` — the builder never needs to approve technical
+prompts, and the agent has no access outside the sandbox.
+
+## Security model (read before exposing this anywhere)
+
+This server drives an **unsandboxed** agent over the mounted repo. It is hardened
+for *local single-user* use, not for the open internet:
+
+- **Loopback only.** `docker-compose.yml` maps `127.0.0.1:8080:8080` — never the
+  LAN. Do not change it to `0.0.0.0`.
+- **Token-gated.** `/chat` requires the `X-Builder-Token` header. Set
+  `BUILDER_TOKEN` to a fixed value, or let the server mint a random one at
+  startup (printed to the log; the bundled chat page is pre-authorized).
+- **Host-checked.** Requests with a non-loopback `Host` are rejected (403), which
+  defeats DNS-rebinding from a browser tab you happen to have open.
+- **Single-flight.** One build at a time; a second concurrent request gets a
+  "busy" reply instead of racing `claude` on one git index.
+
+To put this in front of more than one trusted user, add real auth (reverse proxy
++ SSO), run each request on an isolated worktree, and require human review before
+promoting to the live branch.
+
+## Pieces
+
+- `builder/server.py` — stdlib chat server; each message runs the factory once.
+- `builder/index.html` — the chat UI.
+- `.claude/agents/builder-orchestrator.md` — the user-facing orchestrator
+  (plain language; drives the Layer 0 team).
+- `Dockerfile` / `docker-compose.yml` — isolation + runtime.
+- `deploy/deploy.sh` — gated deploy to {{ delivery.deploy_target }}.
+
+## Hardening before real use
+
+- The built-in token is single-user; add real multi-user auth (reverse proxy + SSO).
+- Run each request on an isolated git worktree/branch; review before promoting to
+  the live branch.
+- Keep secrets in env/secret store; never in the image or the repo.
+- Put the app behind the same container; expose only what's needed.
